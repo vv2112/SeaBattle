@@ -28,7 +28,7 @@ def reset_field(field):
             field[yy][xx] = 0
 
 
-def print_field_for_player(hidden_field, shots_field):
+def print_field_for_player(hidden_field, shots_field, enemy_shots=None):
     """Печатает поле для игрока (враг = скрыто, свое = видно)"""
     print('      А Б В Г Д Е Ж З И К             А Б В Г Д Е Ж З И К')
     print('    |--------------------           |--------------------')
@@ -39,7 +39,11 @@ def print_field_for_player(hidden_field, shots_field):
         # Своё поле
         for x in range(10):
             cell = hidden_field[y][x]
-            if cell == 0: print('.', end=' ')
+            if cell == 0:
+                if enemy_shots is not None and enemy_shots[y][x] == 1:
+                    print('~', end=' ')
+                else:
+                    print('.', end=' ')
             elif cell == 2: print('■', end=' ')  # Корабль
             elif cell == 3: print('✕', end=' ')  # Попадание
             elif cell == 4: print('✕', end=' ')  # Потопленный
@@ -245,7 +249,7 @@ def game_loop():
     
     while True:
         print("\n" + "=" * 60)
-        print_field_for_player(pole_player, pole_player_shots)
+        print_field_for_player(pole_player, pole_player_shots, pole_computer_shots)
         
         player_ships_left = count_alive_ships(pole_player)
         computer_ships_left = count_alive_ships(pole_computer)
@@ -295,9 +299,11 @@ def game_loop():
             while pole_computer_shots[y][x] != 0:
                 x, y = get_computer_move()
             
-            result = shoot(pole_player, pole_computer_shots, x, y)
-            
             letters = ['А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'К']
+            print(f"Компьютер стреляет: {letters[x]}{y+1}")
+            
+            result = shoot(pole_player, pole_computer_shots, x, y)
+
             coords = f"{letters[x]}{y+1}"
             
             if result == 'попадание':
